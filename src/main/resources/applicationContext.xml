@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:jdbcConfig.properties"/>
+
+    <context:component-scan base-package="com.demo.bookstore">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="druid">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="druid"/>
+        <property name="typeAliasesPackage" value="
+                        com.demo.bookstore.user.domain;
+                        com.demo.bookstore.book.domain;
+                        com.demo.bookstore.category.domain;
+                        com.demo.bookstore.admin.domain;
+                        com.demo.bookstore.order.domain;
+                        com.demo.bookstore.cart.domain"/>
+
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 如果當前工廠中只有一個SqlSessionFactory, 則此項注入可以省略-->
+        <!--<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>-->
+
+        <!-- dao接口位置,如果有多個包,可以用逗號或分號分隔-->
+        <property name="basePackage" value="
+        com.demo.bookstore.user.dao;
+        com.demo.bookstore.category.dao;
+        com.demo.bookstore.book.dao;
+        com.demo.bookstore.admin.dao;
+        com.demo.bookstore.order.dao"/>
+    </bean>
+
+    <context:annotation-config></context:annotation-config>
+
+</beans>
